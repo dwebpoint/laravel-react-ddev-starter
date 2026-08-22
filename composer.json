@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/react-starter-kit",
+    "name": "dwebpoint/laravel-react-inertia-ddev-starter",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
     "keywords": [
@@ -9,14 +9,14 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "inertiajs/inertia-laravel": "^3.0",
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14",
-        "spatie/laravel-permission": "^8.3"
+        "spatie/laravel-permission": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",

@@ -1,0 +1,28 @@
+# Customized: node_modules excluded from Mutagen sync (Windows can't
+# hold the node_modules/.bin symlinks on the host side; the container
+# doesn't need node_modules mirrored to the host at all).
+# Please do `ddev mutagen reset` after changing this file.
+# See DDEV Mutagen docs at
+# https://docs.ddev.com/en/stable/users/install/performance/#mutagen
+# For detailed information about mutagen configuration options, see
+# https://mutagen.io/documentation/introduction/configuration
+sync:
+  defaults:
+    mode: "two-way-resolved"
+    stageMode: "neighboring"
+    ignore:
+      paths:
+        # The top-level .git directory is ignored because where possible it's
+        # mounted into the container with a traditional docker bind-mount
+        - "/.git"
+        - "/.tarballs"
+        - "/.ddev/db_snapshots"
+        - "/.ddev/.importdb*"
+        - ".DS_Store"
+        - ".idea"
+
+        # node_modules stays container-only: never synced to the host,
+        # so the .bin symlinks it contains don't need to exist on NTFS.
+        - "**/node_modules"
+    symlink:
+      mode: "portable"

@@ -1,4 +1,4 @@
-# Apnea
+# Laravel 13 + React
 
 A Laravel + React application skeleton, built on Laravel's official [React starter kit](https://laravel.com/docs/starter-kits) and run locally via [DDEV](https://ddev.com).
 
@@ -19,26 +19,34 @@ A Laravel + React application skeleton, built on Laravel's official [React start
 The project runs entirely inside DDEV containers — PHP 8.4, Node 22, MariaDB 11.4, nginx-fpm.
 
 ```bash
-ddev start                 # boot the containers
+ddev start                 # boot the containers (also starts the Vite dev server)
 ddev composer install      # PHP dependencies
 ddev exec npm install       # JS dependencies
 ddev artisan migrate        # run migrations
-ddev exec npm run dev       # start the Vite dev server (HMR)
 ```
 
-The app is then available at **https://apnea.ddev.site**.
+The app is then available at **https://laravel-react.ddev.site**.
 
 ### Vite dev server
 
 `web_extra_exposed_ports` in `.ddev/config.yaml` exposes port 5173 through the DDEV router for HMR, and `vite.config.ts` reads `DDEV_PRIMARY_URL` so the dev server's HMR client connects back to the right host over HTTPS.
 
-The dev server is *not* supervised — it doesn't restart automatically after `ddev restart` or a container rebuild. If you see a 502 on port 5173, just start it again:
+`web_extra_daemons` runs `npm run dev` as a supervised process inside the web container, so it starts automatically on `ddev start`/`ddev restart` — no manual step needed. If you ever see a 502 on port 5173 (e.g. right after `npm install` wipes and rebuilds `node_modules`), just restart the daemon:
 
 ```bash
-ddev exec "cd /var/www/html && npm run dev"
+ddev restart
 ```
 
 For a production-like build instead: `ddev exec npm run build`.
+
+### node_modules and Mutagen
+
+`node_modules` is excluded from Mutagen sync via `.ddev/mutagen/mutagen.yml` (`**/node_modules` ignore rule) and lives **only inside the container** — it does not exist on the host filesystem. This is a deliberate Windows workaround: `node_modules/.bin` is full of Unix symlinks that NTFS can't hold without Developer Mode privileges, and syncing (or bind-mounting) the folder to the host breaks those symlinks.
+
+Practical implications:
+- Always run `npm install`/`npm run <script>` through `ddev exec`, not on the host directly.
+- A host-native editor (not running inside the container) won't have `node_modules` for TypeScript/ESLint IntelliSense — use an editor integration that runs inside the DDEV container, or accept the limitation.
+- After `ddev mutagen reset`, `node_modules` needs a fresh `ddev exec npm install` before the Vite daemon can start successfully.
 
 ## Everyday commands
 
